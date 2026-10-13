@@ -1,0 +1,1153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e8e5db">
+  <title>Entrelinhas | conceitos de interface</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #202923;
+      --muted: #69736b;
+      --paper: #f6f3e9;
+      --page: #e8e5db;
+      --line: #d4d2c7;
+      --soft: #e8e7df;
+      --accent: #2457d6;
+      --accent-contrast: #ffffff;
+      --correct: #397354;
+      --present: #e3a43b;
+      --absent: #d4d8cf;
+      --good-soft: #dce8de;
+      --warning-soft: #f7ebd2;
+      --font-body: "IBM Plex Sans", sans-serif;
+      --font-display: "Bricolage Grotesque", sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+      --radius: 5px;
+      --shadow: 0 16px 42px rgb(36 42 35 / 9%);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--page);
+      background-image: radial-gradient(rgb(32 41 35 / 8%) .7px, transparent .7px);
+      background-size: 12px 12px;
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input { font: inherit; }
+    button { color: inherit; }
+    button:focus-visible, input:focus-visible, a:focus-visible {
+      outline: 3px solid #f2a94a;
+      outline-offset: 3px;
+    }
+
+    .skip-link {
+      position: fixed;
+      z-index: 20;
+      top: 8px;
+      left: 8px;
+      padding: 10px 14px;
+      transform: translateY(-160%);
+      color: #fff;
+      background: #17211a;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .reviewbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 22px 0 18px;
+      color: #313b34;
+    }
+
+    .review-title { min-width: 150px; }
+    .review-title p, .review-title strong { margin: 0; }
+    .review-title p {
+      color: #68716a;
+      font: 500 10px/1.3 var(--font-mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .review-title strong {
+      display: block;
+      margin-top: 5px;
+      font: 700 18px/1.1 var(--font-display);
+    }
+
+    .concept-tabs {
+      display: flex;
+      gap: 5px;
+      padding: 4px;
+      border: 1px solid rgb(32 41 35 / 12%);
+      border-radius: 7px;
+      background: rgb(255 255 255 / 48%);
+    }
+    .concept-tab {
+      min-height: 38px;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 4px;
+      color: #5e675f;
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .concept-tab[aria-selected="true"] {
+      color: white;
+      background: #29352d;
+    }
+    .concept-tab:hover:not([aria-selected="true"]) { background: rgb(255 255 255 / 80%); }
+
+    .app-shell {
+      --app-font: var(--font-body);
+      color: var(--ink);
+      width: min(1120px, calc(100% - 40px));
+      min-height: 760px;
+      margin: 0 auto 48px;
+      overflow: hidden;
+      border: 1px solid rgb(35 43 37 / 9%);
+      border-radius: 10px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      font-family: var(--app-font);
+      transition: background-color .2s ease, color .2s ease;
+    }
+
+    .app-shell[data-theme="arcade"] {
+      color-scheme: dark;
+      --ink: #f5f2e7;
+      --muted: #a3ada3;
+      --paper: #202522;
+      --page: #171b19;
+      --line: #414a43;
+      --soft: #2c342f;
+      --accent: #c8f169;
+      --accent-contrast: #182019;
+      --correct: #9cc957;
+      --present: #f2bd56;
+      --absent: #343c37;
+      --good-soft: #2c3b2d;
+      --warning-soft: #443a26;
+      --font-body: "Atkinson Hyperlegible", sans-serif;
+      --font-display: "Space Grotesk", sans-serif;
+      --font-mono: "DM Mono", monospace;
+      --radius: 2px;
+      --shadow: 0 16px 42px rgb(0 0 0 / 28%);
+      border-color: #333b35;
+    }
+
+    .app-shell[data-theme="press"] {
+      --ink: #222c36;
+      --muted: #596b76;
+      --paper: #f8f6f0;
+      --page: #e9e9e2;
+      --line: #bcc2bf;
+      --soft: #e7e9e5;
+      --accent: #8d332f;
+      --accent-contrast: #ffffff;
+      --correct: #30664b;
+      --present: #c88d22;
+      --absent: #d9ded9;
+      --good-soft: #e1e9e0;
+      --warning-soft: #f2ead6;
+      --font-body: "IBM Plex Sans", sans-serif;
+      --font-display: "Fraunces", Georgia, serif;
+      --font-mono: "IBM Plex Mono", monospace;
+      --radius: 0;
+      --shadow: 0 13px 34px rgb(32 43 48 / 8%);
+    }
+
+    .concept-ribbon {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 37px;
+      padding: 0 32px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      background: color-mix(in srgb, var(--paper), var(--soft) 36%);
+      font: 500 10px/1 var(--font-mono);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .concept-ribbon span:last-child { letter-spacing: 0; }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 22px 32px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .brand-lockup { display: flex; align-items: center; gap: 12px; }
+    .brand-mark {
+      display: grid;
+      width: 40px;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1.5px solid var(--ink);
+      border-radius: 50%;
+      color: var(--accent-contrast);
+      background: var(--accent);
+      font: 700 20px/1 var(--font-display);
+    }
+    .brand-name {
+      display: block;
+      font: 700 16px/1 var(--font-display);
+      letter-spacing: .4px;
+    }
+    .brand-date {
+      display: block;
+      margin-top: 5px;
+      color: var(--muted);
+      font: 500 10px/1 var(--font-mono);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+
+    .utility-actions { display: flex; gap: 7px; }
+    .quiet-button, .share-button, .submit-button, .hint-button, .modal-action {
+      min-height: 40px;
+      padding: 0 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: background-color .15s ease, transform .15s ease;
+    }
+    .quiet-button:hover, .hint-button:hover, .modal-action:hover { background: var(--soft); }
+    .share-button, .submit-button {
+      border-color: var(--accent);
+      color: var(--accent-contrast);
+      background: var(--accent);
+    }
+    .share-button:hover, .submit-button:hover { filter: brightness(.94); }
+    button:active { transform: translateY(1px); }
+
+    .play-area { padding: 25px 32px 30px; }
+    .choice-row {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      padding-bottom: 23px;
+      border-bottom: 1px solid var(--line);
+    }
+    .choice-label {
+      display: block;
+      margin-bottom: 9px;
+      color: var(--muted);
+      font: 500 10px/1 var(--font-mono);
+      letter-spacing: .7px;
+      text-transform: uppercase;
+    }
+    .mode-control, .difficulty-control {
+      display: flex;
+      gap: 5px;
+      margin: 0;
+      padding: 0;
+      border: 0;
+    }
+    .mode-button, .difficulty-button {
+      min-height: 38px;
+      padding: 0 13px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .letter-variants { display: flex; gap: 4px; margin-top: 9px; }
+    .variant-button {
+      min-height: 31px;
+      padding: 0 10px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      background: transparent;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .variant-button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent-contrast); background: var(--accent); }
+    .variant-button:hover:not([aria-pressed="true"]) { background: var(--soft); }
+    .target-boards { display: grid; width: min(100%, 680px); margin: 0 auto; }
+    .target-boards.multi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px 13px; }
+    .target-board { min-width: 0; }
+    .target-caption { display: flex; justify-content: space-between; gap: 7px; margin-bottom: 6px; color: var(--muted); font: 500 10px/1.2 var(--font-mono); }
+    .target-caption .solved { color: var(--correct); font-weight: 700; }
+    .target-board .letter-board { width: 100%; gap: 4px; }
+    .target-board .letter-row { gap: 4px; }
+    .target-board .tile { font-size: clamp(13px, 2.1vw, 20px); }
+    [hidden] { display: none !important; }
+    .mode-button[aria-pressed="true"] {
+      border-color: var(--ink);
+      color: var(--ink);
+      background: var(--soft);
+    }
+    .difficulty-button[aria-pressed="true"] {
+      color: var(--accent-contrast);
+      background: var(--accent);
+    }
+    .difficulty-button:hover:not([aria-pressed="true"]),
+    .mode-button:hover:not([aria-pressed="true"]) { background: var(--soft); }
+    .difficulty-note { min-height: 15px; margin: 7px 0 0; color: var(--muted); font-size: 11px; }
+
+    .game-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 240px;
+      gap: 46px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 14px 0;
+    }
+    .game-column { min-width: 0; }
+    .game-heading { margin: 2px 0 21px; }
+    .eyebrow {
+      margin: 0 0 7px;
+      color: var(--accent);
+      font: 500 10px/1.2 var(--font-mono);
+      letter-spacing: .7px;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font: 600 30px/1.05 var(--font-display);
+      letter-spacing: 0;
+    }
+    .game-summary { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .game-stage { min-width: 0; }
+    .game-status {
+      min-height: 23px;
+      margin: 11px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .game-status[data-kind="success"] { color: var(--correct); font-weight: 700; }
+    .game-status[data-kind="error"] { color: #bd3e32; font-weight: 700; }
+
+    .letter-board {
+      display: grid;
+      gap: 6px;
+      width: min(100%, 350px);
+      margin: 0 auto;
+    }
+    .letter-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+    .tile {
+      display: grid;
+      width: 100%;
+      aspect-ratio: 1;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: transparent;
+      font: 600 clamp(18px, 3vw, 23px)/1 var(--font-mono);
+    }
+    .tile.filled { border-color: var(--muted); }
+    .tile.correct { border-color: var(--correct); color: white; background: var(--correct); }
+    .tile.present { border-color: var(--present); color: #1f211d; background: var(--present); }
+    .tile.absent { border-color: var(--absent); color: var(--ink); background: var(--absent); }
+    .state-symbol { display: block; margin-top: 2px; font: 700 9px/1 var(--font-body); }
+
+    .guess-form { display: flex; gap: 8px; width: min(100%, 350px); margin: 13px auto 0; }
+    .guess-input {
+      width: 0;
+      min-width: 0;
+      min-height: 43px;
+      flex: 1;
+      padding: 0 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: var(--paper);
+      font: 500 15px/1 var(--font-mono);
+      text-transform: uppercase;
+    }
+    .guess-input::placeholder { color: var(--muted); font: 400 12px/1 var(--font-body); text-transform: none; }
+    .submit-button { min-width: 78px; min-height: 43px; }
+
+    .mini-keyboard { display: grid; gap: 6px; width: min(100%, 420px); margin: 15px auto 0; }
+    .keyboard-row { display: flex; justify-content: center; gap: 5px; }
+    .key {
+      display: grid;
+      min-width: 0;
+      height: 39px;
+      flex: 1;
+      place-items: center;
+      padding: 0 4px;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--ink);
+      background: var(--soft);
+      cursor: pointer;
+      font: 600 12px/1 var(--font-mono);
+    }
+    .key.wide { flex: 1.55; font: 600 10px/1 var(--font-body); }
+    .key[data-state="correct"] { color: white; background: var(--correct); }
+    .key[data-state="present"] { color: #1f211d; background: var(--present); }
+    .key[data-state="absent"] { color: var(--muted); background: var(--absent); }
+    .key:hover { border-color: var(--ink); }
+
+    .side-rail { display: flex; flex-direction: column; gap: 23px; padding-top: 3px; }
+    .side-section { padding-top: 14px; border-top: 1px solid var(--line); }
+    .side-section:first-child { padding-top: 0; border-top: 0; }
+    .side-heading {
+      margin: 0 0 12px;
+      font: 600 15px/1.2 var(--font-display);
+    }
+    .streak-number { display: flex; align-items: baseline; gap: 7px; }
+    .streak-number strong { font: 600 37px/1 var(--font-display); }
+    .streak-number span { color: var(--muted); font-size: 12px; }
+    .streak-copy { margin: 6px 0 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .share-copy { margin: -3px 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .side-section .share-button { width: 100%; }
+    .ad-space {
+      display: grid;
+      min-height: 75px;
+      place-items: center;
+      padding: 12px;
+      border: 1px dashed var(--line);
+      color: var(--muted);
+      text-align: center;
+      font: 400 9px/1.5 var(--font-mono);
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    .app-footer {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin: 30px 32px 0;
+      padding: 13px 0 18px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 10px;
+    }
+
+    .semantic-stage { width: min(100%, 480px); margin: 0 auto; }
+    .semantic-score {
+      display: flex;
+      align-items: baseline;
+      gap: 11px;
+      margin: 0 0 13px;
+      padding: 15px 0 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .semantic-score strong { font: 600 38px/1 var(--font-mono); color: var(--accent); }
+    .semantic-score span { color: var(--muted); font-size: 12px; }
+    .semantic-form { display: flex; gap: 8px; }
+    .semantic-input { text-transform: none; }
+    .hint-row { display: flex; align-items: center; gap: 8px; margin-top: 11px; }
+    .hint-button { min-height: 33px; padding: 0 10px; font-size: 11px; }
+    .hint-count { color: var(--muted); font-size: 11px; }
+    .hint-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; padding: 0; list-style: none; }
+    .hint-list li { padding: 5px 8px; border-radius: var(--radius); color: var(--ink); background: var(--warning-soft); font-size: 11px; }
+    .rank-list { display: grid; gap: 0; margin: 15px 0 0; padding: 0; list-style: none; }
+    .rank-item {
+      display: grid;
+      grid-template-columns: 38px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+      min-height: 42px;
+      border-top: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .rank-number { color: var(--muted); font: 500 11px/1 var(--font-mono); }
+    .rank-word { font-weight: 600; }
+    .rank-label { color: var(--muted); font-size: 11px; }
+    .semantic-explainer { margin: 13px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+    dialog {
+      width: min(480px, calc(100% - 30px));
+      max-height: min(78vh, 680px);
+      padding: 0;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--ink);
+      background: var(--paper);
+      box-shadow: 0 24px 80px rgb(0 0 0 / 24%);
+    }
+    dialog::backdrop { background: rgb(16 22 18 / 57%); }
+    .dialog-inner { padding: 23px; }
+    .dialog-head { display: flex; align-items: start; justify-content: space-between; gap: 15px; }
+    .dialog-head h2 { margin: 0; font: 600 23px/1.1 var(--font-display); }
+    .dialog-close { width: 36px; height: 36px; border: 1px solid var(--line); border-radius: 50%; color: var(--ink); background: transparent; cursor: pointer; }
+    .dialog-intro { margin: 9px 0 19px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .archive-list { display: grid; gap: 8px; }
+    .archive-entry { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); }
+    .archive-entry strong, .archive-entry span { display: block; }
+    .archive-entry strong { font-size: 13px; }
+    .archive-entry span { margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .archive-entry button { min-height: 34px; padding: 0 10px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); background: transparent; cursor: pointer; font-size: 11px; font-weight: 600; }
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0; }
+    .stat-item { padding: 12px 0; border-top: 2px solid var(--accent); }
+    .stat-item strong { display: block; font: 600 27px/1 var(--font-display); }
+    .stat-item span { display: block; margin-top: 7px; color: var(--muted); font-size: 11px; }
+    .share-link-label { display: block; margin-bottom: 7px; font-size: 12px; font-weight: 600; }
+    .share-link { width: 100%; min-height: 41px; padding: 0 10px; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); background: var(--paper); font: 11px/1.3 var(--font-mono); }
+    .dialog-actions { display: flex; justify-content: end; gap: 8px; margin-top: 13px; }
+    .dialog-note { min-height: 17px; margin: 9px 0 0; color: var(--muted); font-size: 11px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    .app-shell[data-theme="arcade"] .concept-ribbon { color: #aab4a9; background: #1c211e; }
+    .app-shell[data-theme="arcade"] .brand-mark { border-radius: 3px; }
+    .app-shell[data-theme="arcade"] .app-header { border-bottom-width: 2px; }
+    .app-shell[data-theme="arcade"] .game-layout { max-width: 980px; gap: 32px; }
+    .app-shell[data-theme="arcade"] .game-heading { padding-left: 13px; border-left: 3px solid var(--accent); }
+    .app-shell[data-theme="arcade"] h1 { text-transform: uppercase; }
+    .app-shell[data-theme="arcade"] .tile { font-weight: 500; }
+    .app-shell[data-theme="arcade"] .streak-number strong { color: var(--accent); }
+    .app-shell[data-theme="arcade"] .ad-space { border-style: solid; }
+
+    .app-shell[data-theme="press"] .concept-ribbon { font-family: var(--font-body); }
+    .app-shell[data-theme="press"] .app-header { border-bottom: 3px double var(--ink); }
+    .app-shell[data-theme="press"] .brand-mark { border-radius: 0; }
+    .app-shell[data-theme="press"] .brand-name { font-size: 19px; }
+    .app-shell[data-theme="press"] .play-area { padding-top: 22px; }
+    .app-shell[data-theme="press"] .choice-row { align-items: center; }
+    .app-shell[data-theme="press"] .game-layout { max-width: 970px; grid-template-columns: minmax(0, 1.4fr) minmax(210px, .7fr); gap: 38px; }
+    .app-shell[data-theme="press"] .game-column { padding-right: 28px; border-right: 1px solid var(--line); }
+    .app-shell[data-theme="press"] .game-heading { margin-bottom: 25px; }
+    .app-shell[data-theme="press"] h1 { font-size: 34px; }
+    .app-shell[data-theme="press"] .side-heading { font-size: 18px; }
+    .app-shell[data-theme="press"] .tile { font-size: clamp(17px, 2.5vw, 22px); }
+    .app-shell[data-theme="press"] .app-footer { border-top: 3px double var(--line); }
+
+    @media (max-width: 760px) {
+      .reviewbar { align-items: start; flex-direction: column; gap: 13px; width: min(100% - 24px, 560px); padding: 17px 0 13px; }
+      .concept-tabs { width: 100%; overflow-x: auto; }
+      .concept-tab { flex: 1; padding: 0 9px; }
+      .app-shell { width: calc(100% - 24px); min-height: 0; margin-bottom: 24px; }
+      .concept-ribbon { padding: 0 17px; }
+      .app-header { padding: 17px; }
+      .brand-mark { width: 35px; }
+      .quiet-button { min-height: 37px; padding: 0 9px; font-size: 12px; }
+      .play-area { padding: 18px 17px 22px; }
+      .choice-row { align-items: start; flex-direction: column; gap: 15px; padding-bottom: 17px; }
+      .mode-control, .difficulty-control { width: 100%; }
+      .mode-button, .difficulty-button { flex: 1; padding: 0 8px; }
+      .choice-block { width: 100%; }
+      .game-layout, .app-shell[data-theme="arcade"] .game-layout, .app-shell[data-theme="press"] .game-layout {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 22px;
+        padding: 21px 0 0;
+      }
+      .app-shell[data-theme="press"] .game-column { padding-right: 0; border-right: 0; }
+      h1, .app-shell[data-theme="press"] h1 { font-size: 28px; }
+      .side-rail { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .side-section { min-width: 0; }
+      .side-section:last-child { grid-column: 1 / -1; }
+      .ad-space { min-height: 52px; }
+      .app-footer { flex-direction: column; margin: 20px 17px 0; }
+    }
+
+    @media (max-width: 420px) {
+      .utility-actions { gap: 4px; }
+      .brand-name { font-size: 14px; }
+      .brand-date { font-size: 9px; }
+      .utility-actions .quiet-button { padding: 0 7px; font-size: 11px; }
+      .tile { border-radius: 2px; }
+      .key { height: 36px; font-size: 10px; }
+      .side-rail { grid-template-columns: minmax(0, 1fr); }
+      .side-section:last-child { grid-column: auto; }
+      .share-button { padding: 0 8px; font-size: 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#game-app">Ir para a partida</a>
+  <header class="reviewbar">
+    <div class="review-title">
+      <p>Estudo de interface</p>
+      <strong>Entrelinhas</strong>
+    </div>
+    <nav class="concept-tabs" role="tablist" aria-label="Conceitos visuais">
+      <button class="concept-tab" id="tab-atelier" role="tab" aria-selected="true" aria-controls="game-app" data-theme="atelier">01 · Oficina</button>
+      <button class="concept-tab" id="tab-arcade" role="tab" aria-selected="false" aria-controls="game-app" data-theme="arcade" tabindex="-1">02 · Fliperama</button>
+      <button class="concept-tab" id="tab-press" role="tab" aria-selected="false" aria-controls="game-app" data-theme="press" tabindex="-1">03 · Jornal</button>
+    </nav>
+  </header>
+
+  <main class="app-shell" id="game-app" data-theme="atelier" aria-labelledby="challenge-title">
+    <div class="concept-ribbon">
+      <span id="concept-name">Conceito 01 · Oficina</span>
+      <span id="challenge-date-label">Desafio de hoje · 13 out 2026</span>
+    </div>
+    <header class="app-header">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">E</span>
+        <div>
+          <span class="brand-name">ENTRELINHAS</span>
+          <span class="brand-date" id="brand-date">desafio 284 · terça-feira</span>
+        </div>
+      </div>
+      <nav class="utility-actions" aria-label="Sua área">
+        <button class="quiet-button" type="button" data-dialog="archive-dialog">Arquivo</button>
+        <button class="quiet-button" type="button" data-dialog="stats-dialog">Estatísticas</button>
+      </nav>
+    </header>
+
+    <div class="play-area">
+      <section class="choice-row" aria-label="Configurações da partida">
+        <div class="choice-block">
+          <span class="choice-label">Modo</span>
+          <div class="mode-control" role="group" aria-label="Escolha o modo">
+            <button class="mode-button" type="button" data-mode="letters" aria-pressed="true">Letras</button>
+            <button class="mode-button" type="button" data-mode="meaning" aria-pressed="false">Significados</button>
+          </div>
+          <div class="letter-variants" id="letter-variants" role="group" aria-label="Formato do modo Letras">
+            <button class="variant-button" type="button" data-board-mode="solo" aria-pressed="true">Solo</button>
+            <button class="variant-button" type="button" data-board-mode="duet" aria-pressed="false">Dueto</button>
+            <button class="variant-button" type="button" data-board-mode="quartet" aria-pressed="false">Quarteto</button>
+          </div>
+        </div>
+        <div class="choice-block">
+          <span class="choice-label">Dificuldade</span>
+          <div class="difficulty-control" role="group" aria-label="Escolha a dificuldade">
+            <button class="difficulty-button" type="button" data-level="easy" aria-pressed="false">Fácil</button>
+            <button class="difficulty-button" type="button" data-level="normal" aria-pressed="true">Normal</button>
+            <button class="difficulty-button" type="button" data-level="hard" aria-pressed="false">Difícil</button>
+          </div>
+          <p class="difficulty-note" id="difficulty-note">6 tentativas · palavras do dia a dia</p>
+        </div>
+      </section>
+
+      <div class="game-layout">
+        <section class="game-column" aria-label="Partida">
+          <div class="game-heading">
+            <p class="eyebrow" id="mode-eyebrow">Letras · desafio 284</p>
+            <h1 id="challenge-title">Qual é a palavra?</h1>
+            <p class="game-summary" id="game-summary">Descubra a palavra de cinco letras em até seis tentativas.</p>
+          </div>
+          <div class="game-stage" id="game-stage"></div>
+          <p class="game-status" id="game-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        </section>
+
+        <aside class="side-rail" aria-label="Progresso e compartilhamento">
+          <section class="side-section">
+            <h2 class="side-heading">Sua sequência</h2>
+            <div class="streak-number"><strong>4</strong><span>dias</span></div>
+            <p class="streak-copy">No seu ritmo. Desafios antigos não interrompem sua sequência.</p>
+          </section>
+          <section class="side-section">
+            <h2 class="side-heading">Chame alguém</h2>
+            <p class="share-copy">Envie este desafio para comparar tentativas sem revelar a resposta.</p>
+            <button class="share-button" id="share-open" type="button">Compartilhar desafio</button>
+          </section>
+          <div class="ad-space" aria-label="Área reservada para anúncio discreto">Espaço reservado<br>para anúncio</div>
+        </aside>
+      </div>
+    </div>
+
+    <footer class="app-footer">
+      <span>Protótipo interativo · estatísticas demonstrativas.</span>
+      <span>ENTRELINHAS · palavras em jogo</span>
+    </footer>
+  </main>
+
+  <dialog id="archive-dialog" aria-labelledby="archive-title">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <h2 id="archive-title">Desafios anteriores</h2>
+        <button class="dialog-close" type="button" aria-label="Fechar arquivo">×</button>
+      </div>
+      <p class="dialog-intro">Escolha um desafio por data, modo e dificuldade. Partidas antigas não alteram sua sequência diária.</p>
+      <div class="archive-list">
+        <div class="archive-entry"><div><strong>12 out · Letras</strong><span>Normal · concluído em 4 tentativas</span></div><button type="button" data-archive="letters" data-archive-board-mode="solo" data-archive-level="normal" data-archive-date="2026-10-12" data-archive-number="283">Jogar</button></div>
+        <div class="archive-entry"><div><strong>12 out · Dueto</strong><span>Normal · 2 palavras</span></div><button type="button" data-archive="letters" data-archive-board-mode="duet" data-archive-level="normal" data-archive-date="2026-10-12" data-archive-number="283">Jogar</button></div>
+        <div class="archive-entry"><div><strong>11 out · Significados</strong><span>Fácil · desafio anterior</span></div><button type="button" data-archive="meaning" data-archive-level="easy" data-archive-date="2026-10-11" data-archive-number="282">Jogar</button></div>
+        <div class="archive-entry"><div><strong>10 out · Quarteto</strong><span>Difícil · 4 palavras</span></div><button type="button" data-archive="letters" data-archive-board-mode="quartet" data-archive-level="hard" data-archive-date="2026-10-10" data-archive-number="281">Jogar</button></div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="stats-dialog" aria-labelledby="stats-title">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <h2 id="stats-title">Estatísticas</h2>
+        <button class="dialog-close" type="button" aria-label="Fechar estatísticas">×</button>
+      </div>
+      <p class="dialog-intro">Seu histórico neste navegador, separado por modo e dificuldade.</p>
+      <div class="stats-grid">
+        <div class="stat-item"><strong id="stat-played">18</strong><span>partidas</span></div>
+        <div class="stat-item"><strong id="stat-won">14</strong><span>vitórias</span></div>
+        <div class="stat-item"><strong>4</strong><span>dias seguidos</span></div>
+      </div>
+      <p class="dialog-intro">Limpar os dados deste navegador pode apagar este histórico.</p>
+    </div>
+  </dialog>
+
+  <dialog id="share-dialog" aria-labelledby="share-title">
+    <div class="dialog-inner">
+      <div class="dialog-head">
+        <h2 id="share-title">Convide para jogar</h2>
+        <button class="dialog-close" type="button" aria-label="Fechar compartilhamento">×</button>
+      </div>
+      <p class="dialog-intro">O link abre este mesmo desafio, modo e dificuldade. A resposta continua escondida.</p>
+      <label class="share-link-label" for="share-url">Link do desafio</label>
+      <input class="share-link" id="share-url" readonly>
+      <div class="dialog-actions">
+        <button class="quiet-button" type="button" data-close-dialog>Voltar</button>
+        <button class="modal-action" id="copy-link" type="button">Copiar link</button>
+      </div>
+      <p class="dialog-note" id="share-note" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <script>
+    const levelData = {
+      easy: { attempts: 8, letterWord: "CASAL", duetWords: ["CASAL", "PRAIA"], quartetWords: ["CASAL", "PRAIA", "LIVRO", "NAVIO"], semanticWord: "PRAIA", hints: 3, letterNote: "8 tentativas · palavras comuns", meaningNote: "3 dicas · palavras familiares" },
+      normal: { attempts: 6, letterWord: "PRATO", duetWords: ["PRATO", "LIVRO"], quartetWords: ["PRATO", "LIVRO", "NORTE", "CAMPO"], semanticWord: "MÚSICA", hints: 1, letterNote: "6 tentativas · palavras do dia a dia", meaningNote: "1 dica · vocabulário cotidiano" },
+      hard: { attempts: 5, letterWord: "TRUFA", duetWords: ["TRUFA", "BRISA"], quartetWords: ["TRUFA", "BRISA", "ZEBRA", "VIGOR"], semanticWord: "INÉRCIA", hints: 0, letterNote: "5 tentativas · vocabulário mais raro", meaningNote: "Sem dicas · palavras menos comuns" }
+    };
+
+    const semanticRanks = {
+      "MUSICA": 1, "SOM": 3, "CANCAO": 7, "INSTRUMENTO": 13, "RITMO": 19,
+      "PRAIA": 1, "AREIA": 4, "MAR": 17, "OCEANO": 26, "SOL": 73,
+      "INERCIA": 1, "MOVIMENTO": 21, "ENERGIA": 38, "REPOUSO": 45,
+      "CASA": 120, "LIVRO": 410, "PALAVRA": 920, "JANELA": 2700
+    };
+
+    const archiveAnswers = {
+      "2026-10-12:letters:normal": "CANTO",
+      "2026-10-12:letters:normal:duet": ["CANTO", "TIGRE"],
+      "2026-10-11:meaning:easy": "LIVRO",
+      "2026-10-10:letters:hard:quartet": ["TRUFA", "BRISA", "ZEBRA", "VIGOR"]
+    };
+
+    const letterBudgets = {
+      easy: { solo: 8, duet: 9, quartet: 10 },
+      normal: { solo: 6, duet: 7, quartet: 9 },
+      hard: { solo: 5, duet: 6, quartet: 8 }
+    };
+
+    const app = document.querySelector("#game-app");
+    const gameStage = document.querySelector("#game-stage");
+    const gameStatus = document.querySelector("#game-status");
+    const guessState = { letters: [], meaning: [], hints: [], draft: "", won: false, submitted: 0 };
+    let mode = "letters";
+    let boardMode = "solo";
+    let level = "normal";
+    let concept = "atelier";
+    let challengeDate = "2026-10-13";
+    let challengeNumber = "284";
+
+    function normalized(value) {
+      return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleUpperCase("pt-BR");
+    }
+
+    function answerFor(currentMode = mode, currentLevel = level) {
+      const data = levelData[currentLevel];
+      const archivedAnswer = archiveAnswers[`${challengeDate}:${currentMode}:${currentLevel}`];
+      if (archivedAnswer) return normalized(Array.isArray(archivedAnswer) ? archivedAnswer[0] : archivedAnswer);
+      return normalized(currentMode === "letters" ? data.letterWord : data.semanticWord);
+    }
+
+    function letterAnswers() {
+      const archiveKey = `${challengeDate}:letters:${level}${boardMode === "solo" ? "" : `:${boardMode}`}`;
+      const archived = archiveAnswers[archiveKey];
+      if (archived) return (Array.isArray(archived) ? archived : [archived]).map(normalized);
+      const data = levelData[level];
+      const answers = boardMode === "duet" ? data.duetWords : boardMode === "quartet" ? data.quartetWords : [data.letterWord];
+      return answers.map(normalized);
+    }
+
+    function lettersAttemptLimit() {
+      return letterBudgets[level][boardMode];
+    }
+
+    function setStatus(message, kind = "") {
+      gameStatus.textContent = message;
+      gameStatus.dataset.kind = kind;
+    }
+
+    function updateChrome() {
+      const data = levelData[level];
+      const modeName = mode === "meaning" ? "Significados" : boardMode === "duet" ? "Letras · Dueto" : boardMode === "quartet" ? "Letras · Quarteto" : "Letras · Solo";
+      document.querySelectorAll("[data-mode]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
+      });
+      document.querySelectorAll("[data-board-mode]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.boardMode === boardMode));
+      });
+      document.querySelectorAll("[data-level]").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.level === level));
+      });
+      document.querySelector("#letter-variants").hidden = mode !== "letters";
+      const date = new Date(`${challengeDate}T12:00:00`);
+      const dateLabel = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(date).replace(/\./g, "");
+      const weekday = new Intl.DateTimeFormat("pt-BR", { weekday: "long" }).format(date);
+      document.querySelector("#challenge-date-label").textContent = `${challengeDate === "2026-10-13" ? "Desafio de hoje" : "Desafio anterior"} · ${dateLabel}`;
+      document.querySelector("#brand-date").textContent = `desafio ${challengeNumber} · ${weekday}`;
+      document.querySelector("#mode-eyebrow").textContent = `${modeName} · desafio ${challengeNumber}`;
+      document.querySelector("#challenge-title").textContent = mode === "meaning" ? "A que palavra ela se aproxima?" : boardMode === "quartet" ? "Descubra quatro palavras" : boardMode === "duet" ? "Descubra duas palavras" : "Qual é a palavra?";
+      document.querySelector("#game-summary").textContent = mode === "meaning"
+        ? "Digite uma palavra e acompanhe o índice de proximidade semântica."
+        : boardMode === "solo"
+          ? `Descubra a palavra de cinco letras em até ${data.attempts} tentativas.`
+          : `Um palpite por rodada atualiza todos os tabuleiros. Você tem ${lettersAttemptLimit()} tentativas compartilhadas.`;
+      document.querySelector("#difficulty-note").textContent = mode === "meaning"
+        ? data.meaningNote
+        : boardMode === "solo"
+          ? data.letterNote
+          : `${lettersAttemptLimit()} tentativas compartilhadas · ${boardMode === "duet" ? "2 palavras" : "4 palavras"}`;
+      document.querySelector("#stat-played").textContent = String(18 + guessState.submitted);
+      document.querySelector("#stat-won").textContent = String(14 + (guessState.won ? 1 : 0));
+      renderGame();
+    }
+
+    function markGuess(guess, answer) {
+      const result = Array(guess.length).fill("absent");
+      const remaining = answer.split("");
+      for (let index = 0; index < guess.length; index += 1) {
+        if (guess[index] === answer[index]) {
+          result[index] = "correct";
+          remaining[index] = "";
+        }
+      }
+      for (let index = 0; index < guess.length; index += 1) {
+        if (result[index] !== "correct") {
+          const found = remaining.indexOf(guess[index]);
+          if (found !== -1) {
+            result[index] = "present";
+            remaining[found] = "";
+          }
+        }
+      }
+      return result;
+    }
+
+    function letterStateFor(key) {
+      const states = guessState.letters.flatMap(guess => markGuess(guess, answerFor()));
+      const guesses = guessState.letters;
+      let state = "";
+      guesses.forEach(guess => {
+        markGuess(guess, answerFor()).forEach((result, index) => {
+          if (guess[index] === key && (result === "correct" || (!state && result === "present"))) state = result;
+          else if (guess[index] === key && !state) state = result;
+        });
+      });
+      return state;
+    }
+
+    function renderLetters() {
+      const answers = letterAnswers();
+      const maxRows = lettersAttemptLimit();
+      const current = guessState.draft.slice(0, 5);
+      const solvedCount = answers.filter(answer => guessState.letters.includes(answer)).length;
+      const boardMarkup = answers.map((answer, boardIndex) => {
+        const solvedAt = guessState.letters.findIndex(guess => guess === answer);
+        const isSolved = solvedAt !== -1;
+        const visibleGuesses = isSolved ? guessState.letters.slice(0, solvedAt + 1) : guessState.letters;
+        const boardRows = [];
+        for (let rowIndex = 0; rowIndex < maxRows; rowIndex += 1) {
+          const guess = visibleGuesses[rowIndex] || (!isSolved && rowIndex === visibleGuesses.length ? current : "");
+          const states = visibleGuesses[rowIndex] ? markGuess(guess, answer) : [];
+          const cells = Array.from({ length: 5 }, (_, cellIndex) => {
+            const letter = guess[cellIndex] || "";
+            const state = states[cellIndex] || (letter ? "filled" : "empty");
+            const labels = { correct: "posição correta", present: "na palavra, outra posição", absent: "não aparece na palavra", filled: "letra digitada", empty: "vazia" };
+            const symbol = state === "correct" ? "✓" : state === "present" ? "↔" : state === "absent" ? "×" : "";
+            return `<span class="tile ${state}" aria-label="${letter ? letter + ", " : ""}${labels[state]}">${letter}${symbol ? `<span class="state-symbol" aria-hidden="true">${symbol}</span>` : ""}</span>`;
+          }).join("");
+          boardRows.push(`<div class="letter-row" role="group" aria-label="Tentativa ${rowIndex + 1}">${cells}</div>`);
+        }
+        const solvedLabel = isSolved ? `<span class="solved">✓ Resolvida</span>` : `<span>Em jogo</span>`;
+        return `<section class="target-board" aria-label="Palavra ${boardIndex + 1} de ${answers.length}"><div class="target-caption"><span>Palavra ${boardIndex + 1}/${answers.length}</span>${solvedLabel}</div><div class="letter-board" role="group" aria-label="Tabuleiro da palavra ${boardIndex + 1}, ${maxRows} tentativas">${boardRows.join("")}</div></section>`;
+      }).join("");
+      const remaining = maxRows - guessState.letters.length;
+      const allSolved = solvedCount === answers.length;
+      const boardsClass = answers.length > 1 ? "target-boards multi" : "target-boards";
+      const boardsLabel = answers.length === 1 ? "1 tabuleiro" : `${answers.length} tabuleiros com palpites compartilhados`;
+      const solvedLabel = answers.length === 1 ? "palavra" : "palavras";
+      gameStage.innerHTML = `
+        <div class="${boardsClass}" aria-label="${boardsLabel}">${boardMarkup}</div>
+        <form class="guess-form" id="letters-form">
+          <label class="sr-only" for="letters-input">Digite uma palavra de cinco letras</label>
+          <input class="guess-input" id="letters-input" name="guess" value="${guessState.draft}" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Sua palavra" ${allSolved || remaining === 0 ? "disabled" : ""}>
+          <button class="submit-button" type="submit" ${allSolved || remaining === 0 ? "disabled" : ""}>Enviar</button>
+        </form>
+        <p class="game-status" aria-live="polite" aria-atomic="true">${allSolved ? `Todas as ${answers.length} ${solvedLabel} encontradas em ${guessState.letters.length} tentativas.` : `${guessState.letters.length} de ${maxRows} tentativas · ${remaining} restantes · ${solvedCount}/${answers.length} ${solvedLabel}`}</p>
+        <div class="mini-keyboard" aria-label="Teclado de letras">
+          <div class="keyboard-row">${"QWERTYUIOP".split("").map(keyButton).join("")}</div>
+          <div class="keyboard-row">${"ASDFGHJKL".split("").map(keyButton).join("")}</div>
+          <div class="keyboard-row"><button class="key wide" type="button" data-key="BACKSPACE" aria-label="Apagar última letra">Apagar</button>${"ZXCVBNM".split("").map(keyButton).join("")}<button class="key wide" type="button" data-key="ENTER">Enviar</button></div>
+        </div>`;
+      document.querySelector("#letters-form").addEventListener("submit", submitLetters);
+      document.querySelector("#letters-input").addEventListener("input", event => {
+        event.target.value = normalized(event.target.value).replace(/[^A-Z]/g, "").slice(0, 5);
+        guessState.draft = event.target.value;
+        renderLetters();
+        const input = document.querySelector("#letters-input");
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+      });
+      gameStage.querySelectorAll("[data-key]").forEach(button => button.addEventListener("click", () => useVirtualKey(button.dataset.key)));
+      const keyStates = {};
+      const statePriority = { absent: 1, present: 2, correct: 3 };
+      answers.forEach(answer => guessState.letters.forEach(guess => markGuess(guess, answer).forEach((state, index) => {
+        const key = guess[index];
+        if (!keyStates[key] || statePriority[state] > statePriority[keyStates[key]]) keyStates[key] = state;
+      })));
+      gameStage.querySelectorAll(".key:not(.wide)").forEach(button => {
+        const state = keyStates[button.dataset.key];
+        if (state) button.dataset.state = state;
+      });
+    }
+
+    function keyButton(letter) {
+      return `<button class="key" type="button" data-key="${letter}" aria-label="Inserir ${letter}">${letter}</button>`;
+    }
+
+    function useVirtualKey(value) {
+      const input = document.querySelector("#letters-input");
+      if (!input || input.disabled) return;
+      if (value === "ENTER") {
+        document.querySelector("#letters-form").requestSubmit();
+        return;
+      }
+      if (value === "BACKSPACE") guessState.draft = input.value.slice(0, -1);
+      else if (input.value.length < 5) guessState.draft = input.value + value;
+      renderLetters();
+      const nextInput = document.querySelector("#letters-input");
+      nextInput.focus();
+      nextInput.setSelectionRange(nextInput.value.length, nextInput.value.length);
+    }
+
+    function submitLetters(event) {
+      event.preventDefault();
+      const input = document.querySelector("#letters-input");
+      const guess = normalized(input.value).replace(/[^A-Z]/g, "");
+      if (guess.length !== 5) {
+        setStatus("Digite uma palavra com cinco letras.", "error");
+        input.focus();
+        return;
+      }
+      const maxRows = lettersAttemptLimit();
+      if (guessState.letters.length >= maxRows || guessState.won) return;
+      guessState.letters.push(guess);
+      guessState.draft = "";
+      guessState.submitted += 1;
+      const answers = letterAnswers();
+      const solvedCount = answers.filter(answer => guessState.letters.includes(answer)).length;
+      guessState.won = solvedCount === answers.length;
+      const lost = !guessState.won && guessState.letters.length === maxRows;
+      const unresolved = answers.filter(answer => !guessState.letters.includes(answer));
+      setStatus(guessState.won ? `Você encontrou todas as ${answers.length} palavras.` : lost ? `Fim de jogo. Respostas restantes: ${unresolved.join(", ")}.` : `Palpite aplicado aos tabuleiros. ${maxRows - guessState.letters.length} tentativas restantes; ${solvedCount}/${answers.length} palavras resolvidas.`, guessState.won ? "success" : "");
+      renderGame();
+    }
+
+    function renderMeaning() {
+      const target = answerFor();
+      const data = levelData[level];
+      const hintsLeft = Math.max(0, data.hints - guessState.hints.length);
+      const best = guessState.meaning[0];
+      const hintsMarkup = guessState.hints.length
+        ? `<ul class="hint-list" aria-label="Dicas reveladas">${guessState.hints.map(hint => `<li>${hint}</li>`).join("")}</ul>`
+        : "";
+      const rankItems = guessState.meaning.map(item => `<li class="rank-item"><span class="rank-number">#${item.rank}</span><span class="rank-word">${item.word}</span><span class="rank-label">${item.rank === 1 ? "Resposta" : item.rank <= 5 ? "Muito perto" : item.rank <= 20 ? "Perto" : item.rank <= 100 ? "No caminho" : "Distante"}</span></li>`).join("");
+      gameStage.innerHTML = `
+        <div class="semantic-stage">
+          <div class="semantic-score"><strong>${best ? `#${best.rank}` : "—"}</strong><span>${best ? `melhor palpite · ${best.word}` : "aguardando seu primeiro palpite"}</span></div>
+          <form class="guess-form semantic-form" id="meaning-form">
+            <label class="sr-only" for="meaning-input">Digite qualquer palavra</label>
+            <input class="guess-input semantic-input" id="meaning-input" name="guess" maxlength="32" autocomplete="off" spellcheck="false" placeholder="Digite uma palavra">
+            <button class="submit-button" type="submit">Tentar</button>
+          </form>
+          <div class="hint-row"><button class="hint-button" id="hint-button" type="button" ${hintsLeft === 0 ? "disabled" : ""}>Pedir uma dica</button><span class="hint-count">${hintsLeft} ${hintsLeft === 1 ? "disponível" : "disponíveis"}</span></div>
+          ${hintsMarkup}
+          <ol class="rank-list" aria-label="Palpites e proximidade">${rankItems || `<li class="rank-item"><span class="rank-number">—</span><span class="rank-word">Seus palpites aparecem aqui</span><span class="rank-label">0 palavras</span></li>`}</ol>
+          <p class="semantic-explainer">O número indica proximidade de significado. Quanto menor o ranking, mais perto o palpite está da resposta. Tentativas ilimitadas.</p>
+        </div>`;
+      document.querySelector("#meaning-form").addEventListener("submit", submitMeaning);
+      document.querySelector("#hint-button").addEventListener("click", showHint);
+    }
+
+    function submitMeaning(event) {
+      event.preventDefault();
+      const input = document.querySelector("#meaning-input");
+      const word = input.value.trim();
+      if (word.length < 2) {
+        setStatus("Digite uma palavra para receber o ranking.", "error");
+        input.focus();
+        return;
+      }
+      const normalizedWord = normalized(word);
+      if (guessState.meaning.some(item => normalized(item.word) === normalizedWord)) {
+        setStatus("Você já tentou essa palavra.", "error");
+        input.select();
+        return;
+      }
+      let rank = semanticRanks[normalizedWord];
+      if (!rank) rank = 180 + ((normalizedWord.length * 137 + normalizedWord.charCodeAt(0) * 29) % 3200);
+      if (normalizedWord === answerFor()) rank = 1;
+      guessState.meaning.unshift({ word, rank });
+      guessState.submitted += 1;
+      guessState.won = rank === 1;
+      setStatus(guessState.won ? `Você encontrou a palavra: ${answerFor()}.` : `Palpite registrado. Proximidade ${rank}.`, guessState.won ? "success" : "");
+      renderGame();
+      document.querySelector("#meaning-input")?.focus();
+    }
+
+    function showHint() {
+      const clues = {
+        easy: ["É um lugar de descanso.", "Tem areia e água salgada.", "Muita gente visita no verão."],
+        normal: ["Pode ser ouvida, cantada ou tocada."],
+        hard: []
+      };
+      const clue = clues[level][guessState.hints.length];
+      if (!clue) return;
+      guessState.hints.push(clue);
+      setStatus("Nova dica disponível.");
+      renderGame();
+      document.querySelector("#hint-button")?.focus();
+    }
+
+    function renderGame() {
+      if (mode === "letters") renderLetters();
+      else renderMeaning();
+    }
+
+    document.querySelectorAll(".concept-tab").forEach(button => button.addEventListener("click", () => {
+      concept = button.dataset.theme;
+      app.dataset.theme = concept;
+      document.querySelectorAll(".concept-tab").forEach(tab => {
+        const selected = tab.dataset.theme === concept;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+      });
+      const labels = { atelier: "Conceito 01 · Oficina", arcade: "Conceito 02 · Fliperama", press: "Conceito 03 · Jornal" };
+      document.querySelector("#concept-name").textContent = labels[concept];
+    }));
+
+    document.querySelectorAll("[data-mode]").forEach(button => button.addEventListener("click", () => {
+      mode = button.dataset.mode;
+      guessState.letters = [];
+      guessState.meaning = [];
+      guessState.hints = [];
+      guessState.draft = "";
+      guessState.won = false;
+      setStatus("");
+      updateChrome();
+    }));
+
+    document.querySelectorAll("[data-board-mode]").forEach(button => button.addEventListener("click", () => {
+      boardMode = button.dataset.boardMode;
+      guessState.letters = [];
+      guessState.draft = "";
+      guessState.won = false;
+      setStatus("");
+      updateChrome();
+    }));
+
+    document.querySelectorAll("[data-level]").forEach(button => button.addEventListener("click", () => {
+      level = button.dataset.level;
+      guessState.letters = [];
+      guessState.meaning = [];
+      guessState.hints = [];
+      guessState.draft = "";
+      guessState.won = false;
+      setStatus("");
+      updateChrome();
+    }));
+
+    document.addEventListener("keydown", event => {
+      const selectedIndex = [...document.querySelectorAll(".concept-tab")].findIndex(tab => tab.getAttribute("aria-selected") === "true");
+      if (event.target.matches(".concept-tab") && ["ArrowRight", "ArrowLeft", "Home", "End"].includes(event.key)) {
+        event.preventDefault();
+        const tabs = [...document.querySelectorAll(".concept-tab")];
+        const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (selectedIndex + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        tabs[nextIndex].focus();
+        tabs[nextIndex].click();
+      }
+      if (mode === "letters" && document.activeElement !== document.querySelector("#letters-input") && !event.metaKey && !event.ctrlKey && /^[a-z]$/i.test(event.key)) {
+        useVirtualKey(event.key.toLocaleUpperCase("pt-BR"));
+      }
+      if (mode === "letters" && document.activeElement !== document.querySelector("#letters-input") && event.key === "Backspace") {
+        event.preventDefault();
+        useVirtualKey("BACKSPACE");
+      }
+    });
+
+    document.querySelectorAll("[data-dialog]").forEach(button => button.addEventListener("click", () => {
+      document.querySelector(`#${button.dataset.dialog}`).showModal();
+    }));
+    document.querySelectorAll("dialog .dialog-close, [data-close-dialog]").forEach(button => button.addEventListener("click", () => button.closest("dialog").close()));
+    document.querySelectorAll("dialog").forEach(dialog => dialog.addEventListener("click", event => {
+      if (event.target === dialog) dialog.close();
+    }));
+    document.querySelectorAll("[data-archive]").forEach(button => button.addEventListener("click", () => {
+      mode = button.dataset.archive;
+      boardMode = button.dataset.archiveBoardMode || "solo";
+      level = button.dataset.archiveLevel;
+      challengeDate = button.dataset.archiveDate;
+      challengeNumber = button.dataset.archiveNumber;
+      guessState.letters = [];
+      guessState.meaning = [];
+      guessState.hints = [];
+      guessState.draft = "";
+      guessState.won = false;
+      document.querySelector("#archive-dialog").close();
+      setStatus("Desafio anterior carregado. Sua sequência diária não foi alterada.");
+      updateChrome();
+    }));
+
+    document.querySelector("#share-open").addEventListener("click", () => {
+      const params = new URLSearchParams({ mode, boardMode, level, date: challengeDate, challenge: `${mode}-${boardMode}-${level}-${challengeNumber}` });
+      const base = window.location.href.split("?")[0];
+      document.querySelector("#share-url").value = `${base}?${params.toString()}`;
+      document.querySelector("#share-note").textContent = "";
+      document.querySelector("#share-dialog").showModal();
+      document.querySelector("#share-url").focus();
+    });
+
+    document.querySelector("#copy-link").addEventListener("click", async () => {
+      const input = document.querySelector("#share-url");
+      try {
+        await navigator.clipboard.writeText(input.value);
+        document.querySelector("#share-note").textContent = "Link copiado.";
+      } catch {
+        input.select();
+        document.querySelector("#share-note").textContent = "Link selecionado. Use Ctrl+C para copiar.";
+      }
+    });
+
+    const query = new URLSearchParams(window.location.search);
+    if (["letters", "meaning"].includes(query.get("mode"))) mode = query.get("mode");
+    if (["solo", "duet", "quartet"].includes(query.get("boardMode"))) boardMode = query.get("boardMode");
+    if (["easy", "normal", "hard"].includes(query.get("level"))) level = query.get("level");
+    if (/^\d{4}-\d{2}-\d{2}$/.test(query.get("date") || "")) challengeDate = query.get("date");
+    if (query.get("challenge")?.match(/-(\d+)$/)) challengeNumber = query.get("challenge").match(/-(\d+)$/)[1];
+    updateChrome();
+  </script>
+</body>
+</html>
