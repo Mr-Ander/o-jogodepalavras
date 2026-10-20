@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrelinhas</title>
+    <meta name="description" content="Jogo de palavras em português brasileiro para navegador." />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell" id="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark">E</div>
+          <div>
+            <div class="brand-name">ENTRELINHAS</div>
+            <div class="brand-subtitle" id="challenge-label">Desafio de hoje · 20 out 2026</div>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="ghost-button" id="archive-button" type="button">Arquivo</button>
+          <button class="ghost-button" id="stats-button" type="button">Estatísticas</button>
+        </div>
+      </header>
+
+      <div class="game-section">
+        <div class="selectors">
+          <div class="selector-group">
+            <span class="label">Modo</span>
+            <div class="segment-control" id="mode-controls">
+              <button class="segment active" data-mode="letters" type="button">Letras</button>
+              <button class="segment" data-mode="meaning" type="button">Significados</button>
+            </div>
+            <div class="letter-formats" id="format-controls">
+              <button class="format-button active" data-format="solo" type="button">Solo</button>
+              <button class="format-button" data-format="duet" type="button">Dueto</button>
+              <button class="format-button" data-format="quartet" type="button">Quarteto</button>
+            </div>
+          </div>
+
+          <div class="selector-group">
+            <span class="label">Dificuldade</span>
+            <div class="segment-control" id="difficulty-controls">
+              <button class="segment" data-difficulty="easy" type="button">Fácil</button>
+              <button class="segment active" data-difficulty="normal" type="button">Normal</button>
+              <button class="segment" data-difficulty="hard" type="button">Difícil</button>
+            </div>
+            <div class="difficulty-note" id="difficulty-note">6 tentativas · palavras do dia a dia</div>
+          </div>
+        </div>
+
+        <div class="content-layout">
+          <main class="game-panel">
+            <div class="heading-block">
+              <div class="eyebrow" id="mode-eyebrow">Letras · desafio 284</div>
+              <h1 id="title">Qual é a palavra?</h1>
+              <p id="subtitle">Descubra a palavra de cinco letras em até seis tentativas.</p>
+            </div>
+
+            <div id="game-root"></div>
+            <div id="status" class="status" aria-live="polite"></div>
+          </main>
+
+          <aside class="side-panel">
+            <section class="side-card">
+              <h2>Sua sequência</h2>
+              <div class="streak"><strong id="streak-value">4</strong><span>dias</span></div>
+              <p>Desafios antigos não interrompem sua sequência.</p>
+            </section>
+            <section class="side-card">
+              <h2>Chame alguém</h2>
+              <p>Envie este desafio para comparar tentativas sem revelar a resposta.</p>
+              <button class="primary-button" id="share-button" type="button">Compartilhar desafio</button>
+            </section>
+            <div class="ad-slot">Espaço para anúncio discreto</div>
+          </aside>
+        </div>
+      </div>
+    </div>
+
+    <dialog id="archive-dialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h2>Desafios anteriores</h2>
+          <button class="close-button" type="button" data-close-dialog="archive-dialog">×</button>
+        </div>
+        <div class="dialog-body">
+          <div class="archive-item">
+            <div>
+              <strong>19 out · Letras</strong>
+              <span>Normal · concluído em 4 tentativas</span>
+            </div>
+            <button type="button" class="archive-load" data-date="2026-10-19" data-mode="letters" data-format="solo" data-difficulty="normal">Jogar</button>
+          </div>
+          <div class="archive-item">
+            <div>
+              <strong>18 out · Dueto</strong>
+              <span>Normal · 2 palavras</span>
+            </div>
+            <button type="button" class="archive-load" data-date="2026-10-18" data-mode="letters" data-format="duet" data-difficulty="normal">Jogar</button>
+          </div>
+          <div class="archive-item">
+            <div>
+              <strong>17 out · Significados</strong>
+              <span>Fácil · desafio anterior</span>
+            </div>
+            <button type="button" class="archive-load" data-date="2026-10-17" data-mode="meaning" data-format="solo" data-difficulty="easy">Jogar</button>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="stats-dialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h2>Estatísticas</h2>
+          <button class="close-button" type="button" data-close-dialog="stats-dialog">×</button>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-box"><strong id="stat-played">18</strong><span>partidas</span></div>
+          <div class="stat-box"><strong id="stat-won">14</strong><span>vitórias</span></div>
+          <div class="stat-box"><strong>4</strong><span>dias seguidos</span></div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="share-dialog">
+      <div class="dialog-content">
+        <div class="dialog-header">
+          <h2>Compartilhar desafio</h2>
+          <button class="close-button" type="button" data-close-dialog="share-dialog">×</button>
+        </div>
+        <div class="dialog-body share-body">
+          <label class="share-label" for="share-url">Link do desafio</label>
+          <input id="share-url" class="share-field" readonly />
+          <div class="dialog-actions">
+            <button class="ghost-button" type="button" data-close-dialog="share-dialog">Voltar</button>
+            <button class="primary-button" id="copy-link" type="button">Copiar link</button>
+          </div>
+          <p id="copy-feedback" class="copy-feedback" aria-live="polite"></p>
+        </div>
+      </div>
+    </dialog>
+
+    <script type="module" src="./script.js"></script>
+  </body>
+</html>
