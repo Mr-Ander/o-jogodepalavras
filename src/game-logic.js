@@ -132,7 +132,14 @@ export function getDailyChallenge(date, mode, format, difficulty) {
 }
 
 export function isAllowedGuess(value) {
-  const normalized = normalizeWord(value);
+  const raw = String(value ?? '').trim();
+  if (!raw) return false;
+
+  const compactValue = raw.replace(/\s+/g, '');
+  if (compactValue.length !== 5) return false;
+  if (!/^[A-Za-zÀ-ÖØ-öø-ÿ]+$/u.test(compactValue)) return false;
+
+  const normalized = normalizeWord(compactValue);
   return normalized.length === 5 && dictionaryState.guesses.has(normalized);
 }
 
